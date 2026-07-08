@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina | The Future of Reading</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Override style.css body */
+        body {
+            display: block !important;
+            background-color: var(--bg) !important;
+            color: var(--text) !important;
+            overflow-x: hidden;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            cursor: default !important;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        h1.title {
+            font-size: clamp(5rem, 15vw, 12rem);
+            font-weight: 800;
+            background: linear-gradient(
+                45deg, 
+                #fff 0%, 
+                #a78bfa 25%, 
+                #22d3ee 50%, 
+                var(--primary) 75%, 
+                #fff 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            letter-spacing: -6px; 
+            line-height: 0.9;
+            animation: shine 5s linear infinite;
+            filter: drop-shadow(0 0 35px rgba(139, 92, 246, 0.4));
+            margin: 0;
+        }
+
+        [data-theme="light"] h1.title {
+            background: linear-gradient(to right, #4D0E13, #FFB3B3, #4D0E13);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(77, 14, 19, 0.2));
+            -webkit-text-stroke: 0px;
+        }
+        
+        [data-theme="light"] h1.title::after { display: none; }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .subtitle {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 400;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.85;
+            margin-bottom: 2.5rem;
+            color: var(--text-dim);
+            min-height: 2.5rem;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: var(--primary);
+            margin-left: 4px;
+            vertical-align: middle;
+            border-radius: 2px;
+            animation: blink 0.9s step-end infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* How it works */
+        .how-section {
+            max-width: 900px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 6rem 0 10rem;
+            text-align: center;
+        }
+        .how-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        .how-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 3.5rem;
+            letter-spacing: -1px;
+        }
+        .how-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+        .how-step {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .how-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .how-step:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(139,92,246,0.3);
+            transform: translateY(-6px);
+        }
+        .how-step-num {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .how-step-icon {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            display: block;
+            filter: drop-shadow(0 0 12px rgba(139,92,246,0.4));
+        }
+        .how-step-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.6rem;
+        }
+        .how-step-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 400;
+        }
+        /* enriched feature cards */
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            filter: drop-shadow(0 0 14px rgba(139,92,246,0.5));
+        }
+
+        .enter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text);
+            padding: 1.2rem 3.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .enter-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px var(--glow-primary);
+            border-color: transparent;
+        }
+
+        .features-section {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 8rem 0 12rem;
+            align-items: start;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 2.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+            color: var(--text);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .feature-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+        }
+        
+        .feature-desc {
+            font-size: 1.05rem;
+            font-weight: 300;
+            color: var(--text-dim);
+            margin-top: 1rem;
+            line-height: 1.5;
+            text-shadow: none;
+            letter-spacing: 0.5px;
+            text-transform: none;
+            opacity: 0.9;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .feature-subdesc {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            text-shadow: none;
+            letter-spacing: 0.5px;
+            text-transform: none;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-subdesc::before {
+            content: '→';
+            margin-right: 8px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        [data-theme="light"] .feature-item {
+            background: rgba(238, 228, 218, 0.6);
+            border-color: rgba(77, 14, 19, 0.15);
+            color: var(--text);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+        
+        [data-theme="light"] .feature-item::before {
+            background: linear-gradient(90deg, transparent, rgba(77, 14, 19, 0.2), transparent);
+        }
+
+        [data-theme="light"] .feature-item:hover {
+            background: rgba(238, 228, 218, 0.9);
+            border-color: rgba(77, 14, 19, 0.4);
+            box-shadow: 0 20px 40px rgba(77, 14, 19, 0.15);
+        }
+
+        footer {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        /* Top controls */
+        .top-nav {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .hidden { display: none !important; }
+        
+        /* Disable the app's background blobs here since we have three.js */
+        .background-blobs { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <nav class="top-nav">
+        <button id="theme-toggle" class="theme-btn" title="Switch Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 100 2V2a1 1 0 100-2zm0 18v2a1 1 0 100 2v-2a1 1 0 100-2zM5.99 4.58a1 1 0 111.41 1.41L5.99 4.58zm12.02 12.02a1 1 0 111.41 1.41l-1.41-1.41zM5.99 19.41a1 1 0 11-1.41-1.41l1.41 1.41zm12.02-12.02a1 1 0 11-1.41-1.41l1.41 1.41z"/></svg>
+            <svg class="moon-icon hidden" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 110-14 7 7 0 010 14z"/></svg>
+        </button>
+    </nav>
+
+    <div class="content">
+        <section class="hero-section">
+            <h1 class="title">Lumina</h1>
+            <p class="subtitle" id="typewriter-subtitle"><span id="typewriter-text"></span><span class="typewriter-cursor"></span></p>
+            <a href="app.html" id="open-app-btn" class="enter-btn">Get Started</a>
+        </section>
+
+        <section class="features-section" id="features">
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                Smart Autoscroll
+                <p class="feature-desc">Silky-smooth, pixel-perfect scrolling at any speed you set — from a leisurely pace to a rapid fire delivery.</p>
+                <p class="feature-subdesc">Adjustable 5 – 200 px/s</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">👁️</span>
+                Eye Contact Mode
+                <p class="feature-desc">Text anchors to the top third of the screen — right near your camera — so you always look directly at your audience.</p>
+                <p class="feature-subdesc">Zero setup needed</p>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🌍</span>
+                Real-time Translation
+                <p class="feature-desc">Instantly translate your script into Hindi, Bengali, Tamil, Telugu, Odia, Marathi, and more with one click.</p>
+                <p class="feature-subdesc">7 Indian languages supported</p>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="how-section">
+            <p class="how-heading">How it works</p>
+            <h2 class="how-title">Three steps to a perfect delivery</h2>
+            <div class="how-steps">
+                <div class="how-step">
+                    <p class="how-step-num">Step 01</p>
+                    <span class="how-step-icon">📝</span>
+                    <p class="how-step-title">Paste or Upload</p>
+                    <p class="how-step-desc">Type your script, paste from anywhere, upload a PDF or Word doc, or even dictate using your microphone.</p>
+                </div>
+                <div class="how-step">
+                    <p class="how-step-num">Step 02</p>
+                    <span class="how-step-icon">🎛️</span>
+                    <p class="how-step-title">Tune your settings</p>
+                    <p class="how-step-desc">Set your speed, font, size, text color, and toggle eye contact mode or mirror for a hardware teleprompter.</p>
+                </div>
+                <div class="how-step">
+                    <p class="how-step-num">Step 03</p>
+                    <span class="how-step-icon">🎤</span>
+                    <p class="how-step-title">Present with confidence</p>
+                    <p class="how-step-desc">Hit Start and go full-screen. Pause, fast-forward, or adjust speed mid-read — all with keyboard shortcuts.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            Lumina &copy; 2026. All rights reserved.<br>
+            <span style="font-size: 0.8em; opacity: 0.7; margin-top: 5px; display: inline-block;">Created by Swatalina Palar</span>
+        </footer>
+    </div>
+    
+
+
+    <!-- Three.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="landing.js"></script>
+</body>
+</html>

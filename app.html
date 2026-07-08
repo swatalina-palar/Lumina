@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina | Read with Clarity. Present with Confidence.</title>
+    <meta name="description" content="Lumina — a premium AI-powered teleprompter and auto-scroll reader.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Space+Grotesk:wght@400;600;700;800&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Mono:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Document Parsing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="top-actions">
+        <button id="shortcuts-btn" class="theme-btn" title="Keyboard Shortcuts (?)">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+        </button>
+        <button id="history-btn" class="theme-btn" title="Reading History">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M13 3a9 9 0 00-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 117 7 7 7 0 01-7-7H4a9 9 0 109-9zm-1 5v5l4.25 2.52.75-1.23-3.5-2.09V8z"/></svg>
+        </button>
+        <button id="theme-toggle" class="theme-btn" title="Switch Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 100 2V2a1 1 0 100-2zm0 18v2a1 1 0 100 2v-2a1 1 0 100-2zM5.99 4.58a1 1 0 111.41 1.41L5.99 4.58zm12.02 12.02a1 1 0 111.41 1.41l-1.41-1.41zM5.99 19.41a1 1 0 11-1.41-1.41l1.41 1.41zm12.02-12.02a1 1 0 11-1.41-1.41l1.41 1.41z"/></svg>
+            <svg class="moon-icon hidden" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 110-14 7 7 0 010 14z"/></svg>
+        </button>
+    </div>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    
+    <div id="canvas-container-app" style="position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6;"></div>
+
+    <!-- ═══════════ SETUP SCREEN ═══════════ -->
+    <main class="app-container" id="setup-panel">
+
+        <header>
+            <div class="header-top">
+                <h1>Lumina</h1>
+            </div>
+            <p class="subtitle">Read with clarity. Present with confidence.</p>
+        </header>
+
+        <div class="glass-card">
+
+            <!-- Script Input -->
+            <div class="input-group">
+                <div class="label-row">
+                    <label for="text-input">Your Script</label>
+                    <div class="input-actions">
+                        <input type="file" id="file-upload" class="hidden" accept=".pdf,.docx,.txt">
+                        <button id="upload-btn" class="ghost-btn" title="Upload PDF, Word or Text">Upload</button>
+                        <button id="highlight-btn" class="ghost-btn" title="Highlight selected text">Highlight</button>
+                        <button id="grammar-btn" class="ghost-btn" title="Check grammar and spelling">Grammar</button>
+                        <button id="format-btn" class="ghost-btn" title="Smart-format your pasted text">Format</button>
+                        <button id="voice-btn" class="ghost-btn mic-btn" title="Speak to type">Dictate</button>
+                        <button id="clear-btn" class="ghost-btn danger-ghost">Clear</button>
+                    </div>
+                </div>
+                <div class="textarea-wrapper">
+                    <!-- Font Bar -->
+                    <div class="font-bar">
+                        <span class="bar-label">Font:</span>
+                        <div class="font-btns">
+                            <button class="font-btn active" data-font="'Outfit', sans-serif">Outfit</button>
+                            <button class="font-btn" data-font="'Inter', sans-serif">Inter</button>
+                            <button class="font-btn" data-font="'DM Sans', sans-serif">DM Sans</button>
+                            <button class="font-btn" data-font="'Space Grotesk', sans-serif">Tech</button>
+                            <button class="font-btn" data-font="'Playfair Display', serif">Serif</button>
+                            <button class="font-btn" data-font="'Roboto Mono', monospace">Mono</button>
+                        </div>
+                    </div>
+                    <textarea id="text-input" placeholder="Paste or dictate your speech, script, or notes…"></textarea>
+                    <div class="voice-indicator hidden" id="voice-indicator">
+                        <span class="voice-dot"></span> Listening…
+                    </div>
+                </div>
+                <div id="resume-notice" class="resume-notice hidden">
+                    <span>📍 Saved position found.</span>
+                    <button id="resume-btn" class="resume-btn">Resume from last line →</button>
+                    <button id="resume-dismiss" class="ghost-btn">Dismiss</button>
+                </div>
+
+                <!-- Translation Bar -->
+                <div class="translate-bar">
+                    <span class="translate-label">Translate to:</span>
+                    <div class="lang-btns">
+                        <button class="lang-btn" data-lang="hi" data-name="Hindi">🇮🇳 Hindi</button>
+                        <button class="lang-btn" data-lang="bn" data-name="Bengali">Bengali</button>
+                        <button class="lang-btn" data-lang="or" data-name="Odia">Odia</button>
+                        <button class="lang-btn" data-lang="ta" data-name="Tamil">Tamil</button>
+                        <button class="lang-btn" data-lang="te" data-name="Telugu">Telugu</button>
+                        <button class="lang-btn" data-lang="mr" data-name="Marathi">Marathi</button>
+                        <button class="lang-btn" data-lang="en" data-name="English">English</button>
+                    </div>
+                    <button id="translate-btn" class="translate-btn" disabled>Translate</button>
+                </div>
+                <div id="translate-status" class="translate-status hidden"></div>
+            </div>
+
+            <!-- Options Grid -->
+            <div class="options-row">
+
+                <div class="option-block">
+                    <label>Scroll Speed: <span id="speed-value">20</span> px/s</label>
+                    <div class="speed-setter">
+                        <button class="speed-btn" id="speed-minus">−</button>
+                        <input type="range" id="speed-range" min="5" max="200" value="20">
+                        <button class="speed-btn" id="speed-plus">+</button>
+                    </div>
+                </div>
+
+                <div class="option-block">
+                    <label>Font Size: <span id="font-size-value">32</span>px</label>
+                    <div class="speed-setter">
+                        <button class="speed-btn" id="font-minus">−</button>
+                        <input type="range" id="font-range" min="18" max="72" value="32">
+                        <button class="speed-btn" id="font-plus">+</button>
+                    </div>
+                </div>
+
+                <div class="option-block">
+                    <label>Text Color</label>
+                    <div class="color-presets">
+                        <button class="color-btn active" data-color="#f1f5f9" id="color-white">
+                            <span class="color-dot" style="background:#f1f5f9"></span>White
+                        </button>
+                        <button class="color-btn" data-color="#4ade80" id="color-green">
+                            <span class="color-dot" style="background:#4ade80"></span>Green
+                        </button>
+                        <button class="color-btn" data-color="#fde047" id="color-yellow">
+                            <span class="color-dot" style="background:#fde047"></span>Yellow
+                        </button>
+                        <label class="color-btn custom-color-btn" title="Pick any color">
+                            <span class="color-dot" id="custom-color-dot" style="background: conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"></span>Custom
+                            <input type="color" id="custom-color-input" value="#ffffff" style="position:absolute;opacity:0;width:0;height:0;">
+                        </label>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <!-- Toggles + CTA -->
+            <div class="action-row">
+                <label class="toggle-label" title="Flip text horizontally for teleprompter glass">
+                    <input type="checkbox" id="mirror-toggle">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    Mirror
+                </label>
+                <label class="toggle-label" title="Glowing guide line in the center">
+                    <input type="checkbox" id="focus-toggle" checked>
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    Focus Line
+                </label>
+                <label class="toggle-label" title="Highlight the sentence currently in focus">
+                    <input type="checkbox" id="highlight-toggle" checked>
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    Sentence Highlight
+                </label>
+                <label class="toggle-label" title="Move text to top-third near your camera">
+                    <input type="checkbox" id="eyecontact-toggle">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    Eye Contact
+                </label>
+                <label class="toggle-label" title="3-2-1 countdown before start">
+                    <input type="checkbox" id="countdown-toggle" checked>
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    Countdown
+                </label>
+                <button id="start-btn" class="primary-btn">▶ Start Reading</button>
+            </div>
+
+        </div>
+
+
+
+    </main>
+
+    <!-- ═══════════ READER OVERLAY ═══════════ -->
+    <div class="reader-overlay hidden" id="reader-panel">
+
+        <!-- Progress bar -->
+        <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+        </div>
+
+        <!-- HUD -->
+        <div class="reader-hud">
+            <div class="hud-left">
+                <span class="status-badge" id="status-badge">● Live</span>
+                <span id="current-speed-display">20 px/s</span>
+                <span class="hud-divider">|</span>
+                <span id="time-remaining">-- left</span>
+                <span class="hud-divider">|</span>
+                <span id="wpm-display">-- WPM</span>
+            </div>
+            <div class="hud-right">
+                <span id="progress-pct">0%</span>
+                <button id="mirror-reader-btn" class="hud-icon-btn" title="Mirror (M)">⇆</button>
+                <button id="eyecontact-reader-btn" class="hud-icon-btn" title="Eye Contact Mode">👁</button>
+                <button id="fullscreen-btn" class="hud-icon-btn" title="Fullscreen (F11)">⛶</button>
+                <button id="stop-btn" class="exit-btn">✕ Exit</button>
+            </div>
+        </div>
+
+        <!-- Camera zone guidance -->
+        <div class="camera-zone" id="camera-zone">
+            <span class="camera-dot"></span>
+            Look Here — Eye Contact Mode Active
+        </div>
+
+        <!-- Focus line -->
+        <div class="focus-line" id="focus-line"></div>
+
+        <!-- Text area -->
+        <div id="scroll-container" class="scroll-container">
+            <div id="content-display" class="content-display"></div>
+        </div>
+
+        <!-- Countdown -->
+        <div class="countdown-overlay hidden" id="countdown-overlay">
+            <div class="countdown-number" id="countdown-number">3</div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="reader-controls-bar">
+
+            <!-- Font size -->
+            <div class="bottom-control-group">
+                <span class="bar-label">Text</span>
+                <button class="speed-btn" id="reader-font-minus">−</button>
+                <button class="speed-btn" id="reader-font-plus">+</button>
+            </div>
+
+            <!-- Speed slider -->
+            <div class="bottom-speed-control">
+                <button class="speed-btn" id="dynamic-minus">−</button>
+                <div class="speed-track">
+                    <input type="range" id="dynamic-speed-range" min="5" max="200" value="20">
+                    <span class="speed-label">Speed</span>
+                </div>
+                <button class="speed-btn" id="dynamic-plus">+</button>
+            </div>
+
+            <!-- Play / Pause -->
+            <button id="pause-btn" class="play-pause-btn" title="Space">
+                <svg id="pause-icon" viewBox="0 0 24 24" width="30" height="30">
+                    <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+                <svg id="play-icon" viewBox="0 0 24 24" width="30" height="30" class="hidden">
+                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                </svg>
+            </button>
+
+            <!-- FF -->
+            <div class="ff-control">
+                <button id="ff-btn" class="ff-btn" title="Hold F">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="currentColor" d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                    </svg>
+                    Hold FF
+                </button>
+            </div>
+
+            <!-- Restart -->
+            <div class="bottom-control-group">
+                <button class="hud-icon-btn" id="restart-btn" title="Restart (R)">↺</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════ HISTORY MODAL ═══════════ -->
+    <div class="modal-overlay hidden" id="history-modal">
+        <div class="glass-card modal-content history-content">
+            <button class="modal-close" id="history-close">✕</button>
+            <h2>Reading History</h2>
+            <p class="subtitle">Your recently read scripts and uploads</p>
+            <div id="history-list" class="history-list">
+                <!-- History items injected here -->
+                <div class="empty-history">No history found. Start reading to save scripts!</div>
+            </div>
+            <button id="clear-history-btn" class="ghost-btn danger-ghost" style="margin-top: 1.5rem; width: 100%;">Clear All History</button>
+        </div>
+    </div>
+
+    <!-- ═══════════ KEYBOARD SHORTCUTS MODAL ═══════════ -->
+    <div class="modal-overlay hidden" id="shortcuts-modal">
+        <div class="glass-card modal-content" style="max-width:480px;">
+            <button class="modal-close" id="shortcuts-close">✕</button>
+            <h2 style="margin-bottom:0.4rem;">Keyboard Shortcuts</h2>
+            <p class="subtitle" style="margin-bottom:1.8rem;">Use these while reading</p>
+            <div class="shortcuts-grid">
+                <div class="shortcut-row"><kbd>Space</kbd><span>Pause / Resume</span></div>
+                <div class="shortcut-row"><kbd>Esc</kbd><span>Exit reader</span></div>
+                <div class="shortcut-row"><kbd>↑</kbd><span>Speed up (+5 px/s)</span></div>
+                <div class="shortcut-row"><kbd>↓</kbd><span>Slow down (−5 px/s)</span></div>
+                <div class="shortcut-row"><kbd>F</kbd><span>Hold for Fast Forward (4×)</span></div>
+                <div class="shortcut-row"><kbd>R</kbd><span>Restart from beginning</span></div>
+                <div class="shortcut-row"><kbd>M</kbd><span>Toggle mirror mode</span></div>
+                <div class="shortcut-row"><kbd>E</kbd><span>Toggle eye contact mode</span></div>
+                <div class="shortcut-row"><kbd>?</kbd><span>Open this panel</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ READING STATS OVERLAY ═══════════ -->
+    <div class="modal-overlay hidden" id="stats-overlay">
+        <div class="glass-card stats-card">
+            <div class="stats-icon">🎉</div>
+            <h2 class="stats-title">Reading Complete!</h2>
+            <p class="stats-subtitle">Great job. Here's your session summary.</p>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-duration">--</span>
+                    <span class="stat-label">Duration</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-words">--</span>
+                    <span class="stat-label">Words</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-wpm">--</span>
+                    <span class="stat-label">Avg WPM</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-speed">--</span>
+                    <span class="stat-label">Avg Speed</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:2rem;">
+                <button id="stats-restart-btn" class="primary-btn" style="flex:1;margin-left:0;">↺ Read Again</button>
+                <button id="stats-exit-btn" class="ghost-btn" style="flex:1;padding:0.85rem;">← Back to Setup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
