@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumina | The Future of Reading</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
     <style>
         /* Override style.css body */
         body {
@@ -15,7 +15,7 @@
             background-color: var(--bg) !important;
             color: var(--text) !important;
             overflow-x: hidden;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Sora', sans-serif;
             margin: 0;
             padding: 0;
             cursor: default !important;
@@ -57,11 +57,10 @@
             font-weight: 800;
             background: linear-gradient(
                 45deg, 
-                #fff 0%, 
-                #a78bfa 25%, 
-                #22d3ee 50%, 
-                var(--primary) 75%, 
-                #fff 100%
+                #30362F 0%, 
+                #252622 35%, 
+                #6F756D 70%, 
+                #30362F 100%
             );
             background-size: 200% auto;
             -webkit-background-clip: text; 
@@ -69,20 +68,20 @@
             letter-spacing: -6px; 
             line-height: 0.9;
             animation: shine 5s linear infinite;
-            filter: drop-shadow(0 0 35px rgba(139, 92, 246, 0.4));
+            filter: drop-shadow(0 0 35px rgba(155, 170, 149, 0.25));
             margin: 0;
         }
 
-        [data-theme="light"] h1.title {
-            background: linear-gradient(to right, #4D0E13, #FFB3B3, #4D0E13);
+        [data-theme="dark"] h1.title {
+            background: linear-gradient(to right, #F7F5F0, #9BAA95, #F7F5F0);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(77, 14, 19, 0.2));
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.3));
             -webkit-text-stroke: 0px;
         }
         
-        [data-theme="light"] h1.title::after { display: none; }
+        [data-theme="dark"] h1.title::after { display: none; }
 
         @keyframes shine {
             to { background-position: 200% center; }
@@ -157,7 +156,7 @@
         }
         .how-step:hover {
             background: rgba(255,255,255,0.06);
-            border-color: rgba(139,92,246,0.3);
+            border-color: var(--border-bright);
             transform: translateY(-6px);
         }
         .how-step-num {
@@ -173,7 +172,7 @@
             font-size: 2.8rem;
             margin-bottom: 1rem;
             display: block;
-            filter: drop-shadow(0 0 12px rgba(139,92,246,0.4));
+            filter: drop-shadow(0 0 12px var(--glow-primary));
         }
         .how-step-title {
             font-size: 1.15rem;
@@ -193,7 +192,7 @@
             font-size: 2.5rem;
             margin-bottom: 1rem;
             display: block;
-            filter: drop-shadow(0 0 14px rgba(139,92,246,0.5));
+            filter: drop-shadow(0 0 14px var(--glow-primary));
         }
 
         .enter-btn {
@@ -334,32 +333,261 @@
             color: var(--text-dim);
         }
 
-        /* Top controls */
-        .top-nav {
+        /* Landing Header bar */
+        .landing-header {
             position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            z-index: 100;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px) saturate(1.8);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8);
+            background: rgba(3, 3, 5, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        
+        [data-theme="light"] .landing-header {
+            background: rgba(238, 228, 218, 0.5);
+            border-bottom: 1px solid rgba(77, 14, 19, 0.1);
+        }
+
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        [data-theme="light"] .header-logo {
+            background: linear-gradient(135deg, #4D0E13, #C8A49F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link-item {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link-item:hover {
+            color: var(--text);
+        }
+
+        .nav-link-item.highlight-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+        }
+
+        .nav-link-item.highlight-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--glow-primary);
+        }
+
+        [data-theme="light"] .nav-link-item.highlight-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 15px var(--glow-primary);
+        }
+
+        .nav-right {
             display: flex;
             gap: 0.6rem;
+            align-items: center;
+        }
+
+        /* Hamburger button only visible on mobile/tablet */
+        .hamburger-btn {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .hamburger-btn {
+                display: flex !important;
+            }
+        }
+
+        /* ── Hamburger Menu Overlay ──────────────────────── */
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            background: rgba(3, 3, 5, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .menu-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-content {
+            width: 100%;
+            max-width: 320px;
+            height: 100vh;
+            border-radius: 0 !important;
+            border: none !important;
+            border-left: 1px solid var(--border-bright) !important;
+            background: rgba(5, 5, 8, 0.95) !important;
+            padding: 5rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        [data-theme="light"] .menu-content {
+            background: rgba(238, 228, 218, 0.98) !important;
+            border-left: 1px solid rgba(77, 14, 19, 0.2) !important;
+        }
+
+        .menu-overlay.active .menu-content {
+            transform: translateX(0);
+        }
+
+        .menu-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1.5px;
+        }
+
+        [data-theme="light"] .menu-logo {
+            background: linear-gradient(135deg, #4D0E13, #C8A49F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .menu-link {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            letter-spacing: -0.5px;
+        }
+
+        .menu-link:hover, .menu-link.active {
+            color: var(--text);
+            transform: translateX(6px);
+        }
+
+        .menu-link.highlight-link {
+            margin-top: 1.5rem;
+            padding: 0.65rem 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff !important;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--glow-primary);
+        }
+
+        .menu-link.highlight-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--glow-primary);
+        }
+
+        /* ── Spotlight Hover Glow ────────────────────────── */
+        .feature-item, .how-step {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
         }
 
         .hidden { display: none !important; }
         
         /* Disable the app's background blobs here since we have three.js */
-        .background-blobs { display: none; }
+        /* .background-blobs { display: none; } */
     </style>
 </head>
 <body>
 
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <div id="canvas-container"></div>
 
-    <nav class="top-nav">
-        <button id="theme-toggle" class="theme-btn" title="Switch Theme">
-            <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 100 2V2a1 1 0 100-2zm0 18v2a1 1 0 100 2v-2a1 1 0 100-2zM5.99 4.58a1 1 0 111.41 1.41L5.99 4.58zm12.02 12.02a1 1 0 111.41 1.41l-1.41-1.41zM5.99 19.41a1 1 0 11-1.41-1.41l1.41 1.41zm12.02-12.02a1 1 0 11-1.41-1.41l1.41 1.41z"/></svg>
-            <svg class="moon-icon hidden" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 110-14 7 7 0 010 14z"/></svg>
-        </button>
-    </nav>
+    <header class="landing-header">
+        <div class="header-logo">
+            <span class="logo-text">Lumina</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-link-item">Home</a>
+            <a href="#features" class="nav-link-item">Features</a>
+            <a href="#how-it-works" class="nav-link-item">How It Works</a>
+            <a href="app.html" class="nav-link-item highlight-link">Open App</a>
+        </nav>
+        <div class="nav-right">
+            <button id="theme-toggle" class="theme-btn" title="Switch Theme">
+                <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 100 2V2a1 1 0 100-2zm0 18v2a1 1 0 100 2v-2a1 1 0 100-2zM5.99 4.58a1 1 0 111.41 1.41L5.99 4.58zm12.02 12.02a1 1 0 111.41 1.41l-1.41-1.41zM5.99 19.41a1 1 0 11-1.41-1.41l1.41 1.41zm12.02-12.02a1 1 0 11-1.41-1.41l1.41 1.41z"/></svg>
+                <svg class="moon-icon hidden" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 16a7 7 0 110-14 7 7 0 010 14z"/></svg>
+            </button>
+            <button id="menu-toggle" class="theme-btn hamburger-btn" title="Menu">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Slide-out Menu Overlay -->
+    <div class="menu-overlay" id="menu-overlay">
+        <div class="menu-content glass-card">
+            <button id="menu-close" class="modal-close">✕</button>
+            <h2 class="menu-logo">Lumina</h2>
+            <ul class="menu-links">
+                <li><a href="#" class="menu-link active">Home</a></li>
+                <li><a href="#features" class="menu-link">Features</a></li>
+                <li><a href="#how-it-works" class="menu-link">How It Works</a></li>
+                <li><a href="app.html" class="menu-link highlight-link">Open App</a></li>
+            </ul>
+        </div>
+    </div>
 
     <div class="content">
         <section class="hero-section">
@@ -367,6 +595,8 @@
             <p class="subtitle" id="typewriter-subtitle"><span id="typewriter-text"></span><span class="typewriter-cursor"></span></p>
             <a href="app.html" id="open-app-btn" class="enter-btn">Get Started</a>
         </section>
+
+
 
         <section class="features-section" id="features">
             <div class="feature-item">
@@ -390,7 +620,7 @@
         </section>
 
         <!-- How it works -->
-        <section class="how-section">
+        <section class="how-section" id="how-it-works">
             <p class="how-heading">How it works</p>
             <h2 class="how-title">Three steps to a perfect delivery</h2>
             <div class="how-steps">
@@ -417,7 +647,7 @@
 
         <footer>
             Lumina &copy; 2026. All rights reserved.<br>
-            <span style="font-size: 0.8em; opacity: 0.7; margin-top: 5px; display: inline-block;">Created by Swatalina Palar</span>
+            <span style="font-size: 0.85em; margin-top: 5px; display: inline-block;">Created by Swatalina Palar</span>
         </footer>
     </div>
     
@@ -425,6 +655,6 @@
 
     <!-- Three.js libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="landing.js"></script>
+    <script src="landing.js?v=3"></script>
 </body>
 </html>

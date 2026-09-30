@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +7,8 @@
     <meta name="description" content="Lumina — a premium AI-powered teleprompter and auto-scroll reader.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Space+Grotesk:wght@400;600;700;800&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Mono:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Space+Grotesk:wght@400;600;700;800&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Mono:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
     <!-- Document Parsing Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -47,28 +47,50 @@
             <p class="subtitle">Read with clarity. Present with confidence.</p>
         </header>
 
-        <div class="glass-card">
+        <div class="glass-card main-setup-card">
 
-            <!-- Script Input -->
-            <div class="input-group">
-                <div class="label-row">
-                    <label for="text-input">Your Script</label>
+            <!-- Script Input Workspace -->
+            <div class="editor-card">
+                <!-- Integrated Toolbar -->
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <span class="editor-title">Script Workspace</span>
+                    </div>
                     <div class="input-actions">
                         <input type="file" id="file-upload" class="hidden" accept=".pdf,.docx,.txt">
-                        <button id="upload-btn" class="ghost-btn" title="Upload PDF, Word or Text">Upload</button>
-                        <button id="highlight-btn" class="ghost-btn" title="Highlight selected text">Highlight</button>
-                        <button id="grammar-btn" class="ghost-btn" title="Check grammar and spelling">Grammar</button>
-                        <button id="format-btn" class="ghost-btn" title="Smart-format your pasted text">Format</button>
-                        <button id="voice-btn" class="ghost-btn mic-btn" title="Speak to type">Dictate</button>
-                        <button id="clear-btn" class="ghost-btn danger-ghost">Clear</button>
+                        <button id="upload-btn" class="toolbar-btn" title="Upload PDF, Word or Text">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload
+                        </button>
+                        <button id="voice-btn" class="toolbar-btn mic-btn" title="Speak to type">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                            Dictate
+                        </button>
+                        <button id="highlight-btn" class="toolbar-btn" title="Highlight selected text">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            Highlight
+                        </button>
+                        <button id="grammar-btn" class="toolbar-btn" title="Check grammar and spelling">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Grammar
+                        </button>
+                        <button id="format-btn" class="toolbar-btn" title="Smart-format your pasted text">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Format
+                        </button>
+                        <button id="clear-btn" class="toolbar-btn danger-btn" title="Clear Text">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            Clear
+                        </button>
                     </div>
                 </div>
+                
                 <div class="textarea-wrapper">
-                    <!-- Font Bar -->
+                    <!-- Font Selector integrated inside Editor Workspace -->
                     <div class="font-bar">
-                        <span class="bar-label">Font:</span>
+                        <span class="bar-label">Font Style:</span>
                         <div class="font-btns">
-                            <button class="font-btn active" data-font="'Outfit', sans-serif">Outfit</button>
+                            <button class="font-btn active" data-font="'Sora', sans-serif">Sora</button>
                             <button class="font-btn" data-font="'Inter', sans-serif">Inter</button>
                             <button class="font-btn" data-font="'DM Sans', sans-serif">DM Sans</button>
                             <button class="font-btn" data-font="'Space Grotesk', sans-serif">Tech</button>
@@ -76,111 +98,150 @@
                             <button class="font-btn" data-font="'Roboto Mono', monospace">Mono</button>
                         </div>
                     </div>
+
                     <textarea id="text-input" placeholder="Paste or dictate your speech, script, or notes…"></textarea>
+                    
+                    <!-- Drag & Drop overlay container -->
+                    <div class="dragover-overlay" id="dragover-overlay">
+                        <div class="dragover-content">
+                            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="dragover-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <h3>Drop document to import</h3>
+                            <p>Supports PDF, DOCX, TXT</p>
+                        </div>
+                    </div>
+
+                    <!-- Dictation animation overlay -->
                     <div class="voice-indicator hidden" id="voice-indicator">
-                        <span class="voice-dot"></span> Listening…
+                        <div class="audio-wave-container">
+                            <span class="wave-bar bar-1"></span>
+                            <span class="wave-bar bar-2"></span>
+                            <span class="wave-bar bar-3"></span>
+                            <span class="wave-bar bar-4"></span>
+                            <span class="wave-bar bar-5"></span>
+                        </div>
+                        <span>Listening…</span>
                     </div>
                 </div>
+
                 <div id="resume-notice" class="resume-notice hidden">
                     <span>📍 Saved position found.</span>
                     <button id="resume-btn" class="resume-btn">Resume from last line →</button>
                     <button id="resume-dismiss" class="ghost-btn">Dismiss</button>
                 </div>
-
-                <!-- Translation Bar -->
-                <div class="translate-bar">
-                    <span class="translate-label">Translate to:</span>
-                    <div class="lang-btns">
-                        <button class="lang-btn" data-lang="hi" data-name="Hindi">🇮🇳 Hindi</button>
-                        <button class="lang-btn" data-lang="bn" data-name="Bengali">Bengali</button>
-                        <button class="lang-btn" data-lang="or" data-name="Odia">Odia</button>
-                        <button class="lang-btn" data-lang="ta" data-name="Tamil">Tamil</button>
-                        <button class="lang-btn" data-lang="te" data-name="Telugu">Telugu</button>
-                        <button class="lang-btn" data-lang="mr" data-name="Marathi">Marathi</button>
-                        <button class="lang-btn" data-lang="en" data-name="English">English</button>
-                    </div>
-                    <button id="translate-btn" class="translate-btn" disabled>Translate</button>
-                </div>
-                <div id="translate-status" class="translate-status hidden"></div>
             </div>
 
-            <!-- Options Grid -->
-            <div class="options-row">
+            <div class="card-divider"></div>
 
-                <div class="option-block">
-                    <label>Scroll Speed: <span id="speed-value">20</span> px/s</label>
-                    <div class="speed-setter">
-                        <button class="speed-btn" id="speed-minus">−</button>
-                        <input type="range" id="speed-range" min="5" max="200" value="20">
-                        <button class="speed-btn" id="speed-plus">+</button>
+            <!-- Configuration & Prompter Settings Grid (3 columns on desktop) -->
+            <div class="setup-settings-grid">
+                
+                <!-- Speed & Font Size Section -->
+                <div class="settings-column">
+                    <h2>Configuration</h2>
+                    
+                    <div class="option-block">
+                        <label>Scroll Speed: <span id="speed-value" class="value-highlight">20</span> px/s</label>
+                        <div class="speed-setter">
+                            <button class="speed-btn" id="speed-minus">−</button>
+                            <div class="slider-container">
+                                <input type="range" id="speed-range" min="5" max="200" value="20" class="custom-slider">
+                            </div>
+                            <button class="speed-btn" id="speed-plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="option-block">
+                        <label>Font Size: <span id="font-size-value" class="value-highlight">32</span> px</label>
+                        <div class="speed-setter">
+                            <button class="speed-btn" id="font-minus">−</button>
+                            <div class="slider-container">
+                                <input type="range" id="font-range" min="18" max="72" value="32" class="custom-slider">
+                            </div>
+                            <button class="speed-btn" id="font-plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="option-block">
+                        <label>Text Color Preset</label>
+                        <div class="color-presets">
+                            <button class="color-btn active" data-color="#252622" id="color-white">
+                                <span class="color-dot" style="background:#252622"></span>Charcoal
+                            </button>
+                            <button class="color-btn" data-color="#9BAA95" id="color-green">
+                                <span class="color-dot" style="background:#9BAA95"></span>Sage
+                            </button>
+                            <button class="color-btn" data-color="#6F756D" id="color-yellow">
+                                <span class="color-dot" style="background:#6F756D"></span>Muted Gray
+                            </button>
+                            <label class="color-btn custom-color-btn" title="Pick any color">
+                                <span class="color-dot" id="custom-color-dot" style="background: conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"></span>Custom
+                                <input type="color" id="custom-color-input" value="#ffffff" style="position:absolute;opacity:0;width:0;height:0;">
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="option-block">
-                    <label>Font Size: <span id="font-size-value">32</span>px</label>
-                    <div class="speed-setter">
-                        <button class="speed-btn" id="font-minus">−</button>
-                        <input type="range" id="font-range" min="18" max="72" value="32">
-                        <button class="speed-btn" id="font-plus">+</button>
-                    </div>
-                </div>
-
-                <div class="option-block">
-                    <label>Text Color</label>
-                    <div class="color-presets">
-                        <button class="color-btn active" data-color="#f1f5f9" id="color-white">
-                            <span class="color-dot" style="background:#f1f5f9"></span>White
-                        </button>
-                        <button class="color-btn" data-color="#4ade80" id="color-green">
-                            <span class="color-dot" style="background:#4ade80"></span>Green
-                        </button>
-                        <button class="color-btn" data-color="#fde047" id="color-yellow">
-                            <span class="color-dot" style="background:#fde047"></span>Yellow
-                        </button>
-                        <label class="color-btn custom-color-btn" title="Pick any color">
-                            <span class="color-dot" id="custom-color-dot" style="background: conic-gradient(red,yellow,lime,cyan,blue,magenta,red)"></span>Custom
-                            <input type="color" id="custom-color-input" value="#ffffff" style="position:absolute;opacity:0;width:0;height:0;">
+                <!-- Toggles Section -->
+                <div class="settings-column">
+                    <h2>Prompter Toggles</h2>
+                    <div class="toggles-grid">
+                        <label class="toggle-label" title="Flip text horizontally for teleprompter glass">
+                            <span>Mirror Mode</span>
+                            <input type="checkbox" id="mirror-toggle">
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        </label>
+                        <label class="toggle-label" title="Glowing guide line in the center">
+                            <span>Focus Guide Line</span>
+                            <input type="checkbox" id="focus-toggle" checked>
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        </label>
+                        <label class="toggle-label" title="Highlight the sentence currently in focus">
+                            <span>Sentence Glow</span>
+                            <input type="checkbox" id="highlight-toggle" checked>
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        </label>
+                        <label class="toggle-label" title="Move text to top-third near your camera">
+                            <span>Eye Contact Anchoring</span>
+                            <input type="checkbox" id="eyecontact-toggle">
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        </label>
+                        <label class="toggle-label" title="3-2-1 countdown before start">
+                            <span>3-2-1 Countdown</span>
+                            <input type="checkbox" id="countdown-toggle" checked>
+                            <span class="toggle-track"><span class="toggle-thumb"></span></span>
                         </label>
                     </div>
                 </div>
 
-
+                <!-- Translation Section -->
+                <div class="settings-column">
+                    <h2>Smart Translation</h2>
+                    <div class="translate-bar">
+                        <span class="translate-label">Language</span>
+                        <div class="lang-btns">
+                            <button class="lang-btn" data-lang="hi" data-name="Hindi">🇮🇳 Hindi</button>
+                            <button class="lang-btn" data-lang="bn" data-name="Bengali">Bengali</button>
+                            <button class="lang-btn" data-lang="or" data-name="Odia">Odia</button>
+                            <button class="lang-btn" data-lang="ta" data-name="Tamil">Tamil</button>
+                            <button class="lang-btn" data-lang="te" data-name="Telugu">Telugu</button>
+                            <button class="lang-btn" data-lang="mr" data-name="Marathi">Marathi</button>
+                            <button class="lang-btn" data-lang="en" data-name="English">English</button>
+                        </div>
+                        <button id="translate-btn" class="translate-btn" disabled>Translate</button>
+                    </div>
+                    <div id="translate-status" class="translate-status hidden"></div>
+                </div>
 
             </div>
 
-            <!-- Toggles + CTA -->
-            <div class="action-row">
-                <label class="toggle-label" title="Flip text horizontally for teleprompter glass">
-                    <input type="checkbox" id="mirror-toggle">
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                    Mirror
-                </label>
-                <label class="toggle-label" title="Glowing guide line in the center">
-                    <input type="checkbox" id="focus-toggle" checked>
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                    Focus Line
-                </label>
-                <label class="toggle-label" title="Highlight the sentence currently in focus">
-                    <input type="checkbox" id="highlight-toggle" checked>
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                    Sentence Highlight
-                </label>
-                <label class="toggle-label" title="Move text to top-third near your camera">
-                    <input type="checkbox" id="eyecontact-toggle">
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                    Eye Contact
-                </label>
-                <label class="toggle-label" title="3-2-1 countdown before start">
-                    <input type="checkbox" id="countdown-toggle" checked>
-                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                    Countdown
-                </label>
-                <button id="start-btn" class="primary-btn">▶ Start Reading</button>
+            <div class="card-divider"></div>
+
+            <!-- Start Action Button (Full width at bottom of card) -->
+            <div class="start-action-row">
+                <button id="start-btn" class="primary-btn pulse-button">▶ Start Reading</button>
             </div>
 
         </div>
-
-
 
     </main>
 
@@ -343,6 +404,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

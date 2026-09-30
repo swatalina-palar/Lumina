@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let scrollSpeed     = 20;
     let baseSpeed       = 20;
     let fontSize        = 32;
-    let readerFont      = "'Outfit', sans-serif";
+    let readerFont      = "'Sora', sans-serif";
     let textColor       = '#f1f5f9';
     document.documentElement.style.setProperty('--user-text-color', textColor);
     let isMirrored      = false;
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        uploadBtn.textContent = '⏳ Reading...';
+        uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Reading...';
         uploadBtn.disabled = true;
 
         try {
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('File parse error:', err);
             setTranslateStatus('error', `✗ Failed to read file: ${err.message}`);
         } finally {
-            uploadBtn.textContent = '📄 Upload';
+            uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload';
             uploadBtn.disabled = false;
             fileUpload.value = '';
         }
@@ -428,13 +428,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ══════════════════════════════════════════════════════════
+    //  DRAG & DROP IMPORT
+    // ══════════════════════════════════════════════════════════
+    const dragoverOverlay = document.getElementById('dragover-overlay');
+    const textareaWrapper = document.querySelector('.textarea-wrapper');
+
+    if (textareaWrapper && dragoverOverlay) {
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            textareaWrapper.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight/show overlay when item is dragged over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            textareaWrapper.addEventListener(eventName, () => {
+                dragoverOverlay.classList.add('active');
+            }, false);
+        });
+
+        // Hide overlay when item leaves
+        dragoverOverlay.addEventListener('dragleave', () => {
+            dragoverOverlay.classList.remove('active');
+        }, false);
+
+        // Handle dropped files
+        textareaWrapper.addEventListener('drop', async (e) => {
+            dragoverOverlay.classList.remove('active');
+            
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (!files || files.length === 0) return;
+            
+            const file = files[0];
+            uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Reading...';
+            uploadBtn.disabled = true;
+
+            try {
+                let text = '';
+                const extension = file.name.split('.').pop().toLowerCase();
+
+                if (extension === 'pdf') {
+                    text = await parsePDF(file);
+                } else if (extension === 'docx') {
+                    text = await parseDocx(file);
+                } else {
+                    text = await file.text();
+                }
+
+                if (text.trim()) {
+                    textInput.value = text;
+                    localStorage.setItem(STORAGE_SCRIPT, text);
+                    originalScript = null; // reset translation
+                    setTranslateStatus('success', `✓ Loaded ${file.name} (Dropped)`);
+                    resumeNotice.classList.add('hidden');
+                    localStorage.removeItem(STORAGE_SCROLL);
+                }
+            } catch (err) {
+                console.error('Drop parse error:', err);
+                setTranslateStatus('error', `✗ Failed to read dropped file: ${err.message}`);
+            } finally {
+                uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload';
+                uploadBtn.disabled = false;
+            }
+        }, false);
+    }
+
+    // ══════════════════════════════════════════════════════════
     //  GRAMMAR CHECK (LanguageTool API)
     // ══════════════════════════════════════════════════════════
     grammarBtn.addEventListener('click', async () => {
         const text = textInput.value.trim();
         if (!text) return;
 
-        grammarBtn.textContent = '⏳ Checking...';
+        grammarBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Checking...';
         grammarBtn.disabled = true;
 
         try {
@@ -474,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Grammar check error:', err);
             setTranslateStatus('error', '✗ Grammar check failed. Please check internet connection.');
         } finally {
-            grammarBtn.textContent = '⚖ Grammar';
+            grammarBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Grammar';
             grammarBtn.disabled = false;
         }
     });
@@ -499,11 +571,11 @@ document.addEventListener('DOMContentLoaded', () => {
         textInput.value = formatted.join('\n').replace(/\n{3,}/g, '\n\n').trim();
         localStorage.setItem(STORAGE_SCRIPT, textInput.value);
 
-        formatBtn.textContent = '✓ Done!';
+        formatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Done!';
         formatBtn.style.borderColor = '#4ade80';
         formatBtn.style.color = '#4ade80';
         setTimeout(() => {
-            formatBtn.textContent = '✦ Format';
+            formatBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Format';
             formatBtn.style.borderColor = '';
             formatBtn.style.color = '';
         }, 1500);
@@ -535,11 +607,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 localStorage.setItem(STORAGE_SCRIPT, textInput.value);
             } else {
-                const oldText = highlightBtn.textContent;
-                highlightBtn.textContent = 'Select Text!';
+                const oldHTML = highlightBtn.innerHTML;
+                highlightBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Select Text!';
                 highlightBtn.style.color = 'var(--accent)';
                 setTimeout(() => {
-                    highlightBtn.textContent = oldText;
+                    highlightBtn.innerHTML = oldHTML;
                     highlightBtn.style.color = '';
                 }, 1500);
             }
@@ -582,14 +654,14 @@ document.addEventListener('DOMContentLoaded', () => {
         isRecording = true;
         textInput.setAttribute('data-base', textInput.value ? textInput.value + '\n' : '');
         recognition.start();
-        voiceBtn.textContent = '⏹ Stop';
+        voiceBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/></svg> Stop';
         voiceBtn.classList.add('recording');
         voiceIndicator.classList.remove('hidden');
     };
     const stopVoice = () => {
         isRecording = false;
         if (recognition) recognition.stop();
-        voiceBtn.textContent = '🎙 Dictate';
+        voiceBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg> Dictate';
         voiceBtn.classList.remove('recording');
         voiceIndicator.classList.add('hidden');
         textInput.removeAttribute('data-base');
@@ -979,6 +1051,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Theme Toggle Handler
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const html = document.documentElement;
+            const isLight = html.getAttribute('data-theme') === 'dark';
+            if (isLight) {
+                html.setAttribute('data-theme', 'light');
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+            }
+        });
+    }
+
     // Stats overlay buttons
     if (statsRestartBtn) statsRestartBtn.addEventListener('click', () => {
         statsOverlay.classList.add('hidden');
@@ -1005,6 +1094,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  AUTH & HISTORY LOGIC
     // ══════════════════════════════════════════════════════════
     function updateAuthUI() {
+        if (!authBtn) return;
         if (currentUser) {
             authBtn.className = "user-profile-btn";
             authBtn.innerHTML = `<img src="${currentUser.photo || 'https://ui-avatars.com/api/?name=' + currentUser.email}" title="Logged in as ${currentUser.email}">`;
@@ -1015,57 +1105,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateAuthUI();
 
-    authBtn.addEventListener('click', () => {
-        if (currentUser) {
-            if (confirm(`Logout from ${currentUser.email}?`)) {
-                currentUser = null;
-                localStorage.removeItem(STORAGE_USER);
-                updateAuthUI();
+    if (authBtn) {
+        authBtn.addEventListener('click', () => {
+            if (currentUser) {
+                if (confirm(`Logout from ${currentUser.email}?`)) {
+                    currentUser = null;
+                    localStorage.removeItem(STORAGE_USER);
+                    updateAuthUI();
+                }
+            } else if (authModal) {
+                authModal.classList.remove('hidden');
             }
-        } else {
-            authModal.classList.remove('hidden');
-        }
-    });
+        });
+    }
 
-    authClose.addEventListener('click', () => authModal.classList.add('hidden'));
+    if (authClose && authModal) {
+        authClose.addEventListener('click', () => authModal.classList.add('hidden'));
+    }
     
-    tabLogin.addEventListener('click', () => {
-        authMode = 'login';
-        tabLogin.classList.add('active');
-        tabSignup.classList.remove('active');
-        authSubmitBtn.textContent = 'Login to Lumina';
-    });
-    
-    tabSignup.addEventListener('click', () => {
-        authMode = 'signup';
-        tabSignup.classList.add('active');
-        tabLogin.classList.remove('active');
-        authSubmitBtn.textContent = 'Create Account';
-    });
-
-    authForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = authEmail.value;
+    if (tabLogin && tabSignup && authSubmitBtn) {
+        tabLogin.addEventListener('click', () => {
+            authMode = 'login';
+            tabLogin.classList.add('active');
+            tabSignup.classList.remove('active');
+            authSubmitBtn.textContent = 'Login to Lumina';
+        });
         
-        if (authMode === 'signup') {
-            // Switch to OTP Screen
-            authForm.classList.add('hidden');
-            otpScreen.classList.remove('hidden');
-            otpEmailDisplay.textContent = email;
-            startOtpTimer();
-            setAuthMsg('success', '✓ Verification code sent!');
-        } else {
-            // Direct login
-            currentUser = { email, photo: null };
-            localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-            setAuthMsg('success', 'Welcome back!');
-            setTimeout(() => {
-                authModal.classList.add('hidden');
-                updateAuthUI();
-                setAuthMsg('', '');
-            }, 1000);
-        }
-    });
+        tabSignup.addEventListener('click', () => {
+            authMode = 'signup';
+            tabSignup.classList.add('active');
+            tabLogin.classList.remove('active');
+            authSubmitBtn.textContent = 'Create Account';
+        });
+    }
+
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = authEmail ? authEmail.value : '';
+            
+            if (authMode === 'signup' && authForm && otpScreen && otpEmailDisplay) {
+                // Switch to OTP Screen
+                authForm.classList.add('hidden');
+                otpScreen.classList.remove('hidden');
+                otpEmailDisplay.textContent = email;
+                startOtpTimer();
+                setAuthMsg('success', '✓ Verification code sent!');
+            } else {
+                // Direct login
+                currentUser = { email, photo: null };
+                localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
+                setAuthMsg('success', 'Welcome back!');
+                setTimeout(() => {
+                    if (authModal) authModal.classList.add('hidden');
+                    updateAuthUI();
+                    setAuthMsg('', '');
+                }, 1000);
+            }
+        });
+    }
 
     function setAuthMsg(type, text) {
         authMsg.className = `auth-msg ${type}`;
@@ -1073,44 +1171,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // OTP Digit Handling
-    otpBoxes.forEach((box, idx) => {
-        box.addEventListener('input', (e) => {
-            if (e.target.value && idx < otpBoxes.length - 1) {
-                otpBoxes[idx + 1].focus();
-            }
+    if (otpBoxes && otpBoxes.length > 0) {
+        otpBoxes.forEach((box, idx) => {
+            box.addEventListener('input', (e) => {
+                if (e.target.value && idx < otpBoxes.length - 1) {
+                    otpBoxes[idx + 1].focus();
+                }
+            });
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                    otpBoxes[idx - 1].focus();
+                }
+            });
         });
-        box.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && !e.target.value && idx > 0) {
-                otpBoxes[idx - 1].focus();
-            }
-        });
-    });
+    }
 
-    otpVerifyBtn.addEventListener('click', () => {
-        const code = Array.from(otpBoxes).map(b => b.value).join('');
-        if (code.length === 4) {
-            otpVerifyBtn.innerHTML = 'Verifying...';
-            setTimeout(() => {
-                currentUser = { email: authEmail.value, photo: null };
-                localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-                updateAuthUI();
-                setAuthMsg('success', '✓ Email verified! Account created.');
+    if (otpVerifyBtn) {
+        otpVerifyBtn.addEventListener('click', () => {
+            const code = Array.from(otpBoxes || []).map(b => b.value).join('');
+            if (code.length === 4) {
+                otpVerifyBtn.innerHTML = 'Verifying...';
                 setTimeout(() => {
-                    authModal.classList.add('hidden');
-                    otpScreen.classList.add('hidden');
-                    authForm.classList.remove('hidden');
-                    setAuthMsg('', '');
-                    otpVerifyBtn.innerHTML = 'Verify & Create Account';
-                    otpBoxes.forEach(b => b.value = '');
-                }, 1500);
-            }, 1000);
-        } else {
-            setAuthMsg('error', 'Please enter the 4-digit code.');
-        }
-    });
+                    currentUser = { email: authEmail ? authEmail.value : 'user@example.com', photo: null };
+                    localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
+                    updateAuthUI();
+                    setAuthMsg('success', '✓ Email verified! Account created.');
+                    setTimeout(() => {
+                        if (authModal) authModal.classList.add('hidden');
+                        if (otpScreen) otpScreen.classList.add('hidden');
+                        if (authForm) authForm.classList.remove('hidden');
+                        setAuthMsg('', '');
+                        otpVerifyBtn.innerHTML = 'Verify & Create Account';
+                        if (otpBoxes) otpBoxes.forEach(b => b.value = '');
+                    }, 1500);
+                }, 1000);
+            } else {
+                setAuthMsg('error', 'Please enter the 4-digit code.');
+            }
+        });
+    }
 
     let otpTimer;
     function startOtpTimer() {
+        if (!resendOtpBtn || !resendTimerEl) return;
         let seconds = 30;
         resendOtpBtn.disabled = true;
         clearInterval(otpTimer);
@@ -1125,40 +1228,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    resendOtpBtn.addEventListener('click', () => {
-        setAuthMsg('success', '✓ New code sent!');
-        startOtpTimer();
-        resendOtpBtn.innerHTML = 'Resend in <span id="resend-timer">30</span>s';
-    });
+    if (resendOtpBtn) {
+        resendOtpBtn.addEventListener('click', () => {
+            setAuthMsg('success', '✓ New code sent!');
+            startOtpTimer();
+            resendOtpBtn.innerHTML = 'Resend in <span id="resend-timer">30</span>s';
+        });
+    }
 
-    googleLoginBtn.addEventListener('click', () => {
-        googleLoginBtn.innerHTML = '⏳ Connecting...';
-        setTimeout(() => {
-            currentUser = { 
-                email: "demo.user@gmail.com", 
-                photo: "https://lh3.googleusercontent.com/a/default-user=s96-c" 
-            };
-            localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-            updateAuthUI();
-            authModal.classList.add('hidden');
-            googleLoginBtn.innerHTML = `<svg viewBox="0 0 48 48" width="20" height="20">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg> Continue with Google`;
-        }, 1200);
-    });
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', () => {
+            googleLoginBtn.innerHTML = '⏳ Connecting...';
+            setTimeout(() => {
+                currentUser = { 
+                    email: "demo.user@gmail.com", 
+                    photo: "https://lh3.googleusercontent.com/a/default-user=s96-c" 
+                };
+                localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
+                updateAuthUI();
+                if (authModal) authModal.classList.add('hidden');
+            }, 1200);
+        });
+    }
 
     // History Logic
-    historyBtn.addEventListener('click', () => {
-        renderHistory();
-        historyModal.classList.remove('hidden');
-    });
-    historyClose.addEventListener('click', () => historyModal.classList.add('hidden'));
+    if (historyBtn && historyModal) {
+        historyBtn.addEventListener('click', () => {
+            renderHistory();
+            historyModal.classList.remove('hidden');
+        });
+    }
+    if (historyClose && historyModal) {
+        historyClose.addEventListener('click', () => historyModal.classList.add('hidden'));
+    }
 
     function saveToHistory(text) {
-        if (!text.trim()) return;
+        if (!text || !text.trim()) return;
         const newItem = {
             id: Date.now(),
             date: new Date().toLocaleString(),
@@ -1173,6 +1278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderHistory() {
+        if (!historyList) return;
         if (readingHistory.length === 0) {
             historyList.innerHTML = '<div class="empty-history">No history found. Start reading to save scripts!</div>';
             return;
@@ -1190,28 +1296,30 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('click', () => {
                 const item = readingHistory.find(h => h.id == el.dataset.id);
                 if (item) {
-                    textInput.value = item.text;
+                    if (textInput) textInput.value = item.text;
                     localStorage.setItem(STORAGE_SCRIPT, item.text);
-                    historyModal.classList.add('hidden');
+                    if (historyModal) historyModal.classList.add('hidden');
                     setTranslateStatus('success', '✓ Loaded from history');
                 }
             });
         });
     }
 
-    clearHistoryBtn.addEventListener('click', () => {
-        if (confirm('Clear all reading history?')) {
-            readingHistory = [];
-            localStorage.removeItem(STORAGE_HIST);
-            renderHistory();
-        }
-    });
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Clear all reading history?')) {
+                readingHistory = [];
+                localStorage.removeItem(STORAGE_HIST);
+                renderHistory();
+            }
+        });
+    }
 
     // Close modals on escape
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            authModal.classList.add('hidden');
-            historyModal.classList.add('hidden');
+            if (authModal) authModal.classList.add('hidden');
+            if (historyModal) historyModal.classList.add('hidden');
         }
     });
     
@@ -1284,12 +1392,12 @@ document.addEventListener('DOMContentLoaded', () => {
             particles.rotation.x = time * 0.2;
             
             // Adjust color based on theme
-            if (document.documentElement.getAttribute('data-theme') === 'light') {
-                material.uniforms.color.value.setHex(0x4D0E13);
-                material.blending = THREE.NormalBlending;
-            } else {
-                material.uniforms.color.value.setHex(0x8b5cf6);
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                material.uniforms.color.value.setHex(0x9BAA95);
                 material.blending = THREE.AdditiveBlending;
+            } else {
+                material.uniforms.color.value.setHex(0x30362F);
+                material.blending = THREE.NormalBlending;
             }
             
             renderer.render(scene, camera);

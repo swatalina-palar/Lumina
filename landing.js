@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scene = new THREE.Scene();
 
     // Add some subtle fog for depth
-    scene.fog = new THREE.FogExp2(0x030305, 0.0015);
+    scene.fog = new THREE.FogExp2(0xF7F5F0, 0.0015);
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
     camera.position.set(0, 0, 800);
@@ -167,10 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateColors(isLightTheme) {
         if (isLightTheme) {
-            scene.fog.color.setHex(0xbba58e);
+            scene.fog.color.setHex(0xF7F5F0);
             material.blending = THREE.NormalBlending;
         } else {
-            scene.fog.color.setHex(0x030305);
+            scene.fog.color.setHex(0x1B201A);
             material.blending = THREE.AdditiveBlending;
         }
     }
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let p = 0; p < particlesCount; p++) {
             // Move stars towards the camera (warp effect)
-            positions[i + 2] += velocities[p] * 2;
+            positions[i + 2] += velocities[p] * 0.6;
             
             // If star passes camera, reset it far back
             if (positions[i + 2] > 1000) {
@@ -222,10 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const normalizedZ = (zPos + 2000) / 3000;
             
             if (isLight) {
-                tempColor.setHex(0x4D0E13).lerp(new THREE.Color(0xC8A49F), normalizedZ);
+                tempColor.setHex(0x30362F).lerp(new THREE.Color(0x9BAA95), normalizedZ);
             } else {
-                // Purple to Cyan space transition
-                tempColor.setHex(0x8b5cf6).lerp(new THREE.Color(0x06b6d4), normalizedZ);
+                tempColor.setHex(0x9BAA95).lerp(new THREE.Color(0xDDE4D8), normalizedZ);
             }
 
             // Add some randomness to colors for a sparkling effect
@@ -244,6 +243,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     animate();
+
+    // --- HAMBURGER MENU TOGGLE ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuClose = document.getElementById('menu-close');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuLinks = document.querySelectorAll('.menu-link');
+
+    if (menuToggle && menuClose && menuOverlay) {
+        menuToggle.addEventListener('click', () => {
+            menuOverlay.classList.add('active');
+        });
+
+        menuClose.addEventListener('click', () => {
+            menuOverlay.classList.remove('active');
+        });
+
+        // Close menu when clicking outside menu-content
+        menuOverlay.addEventListener('click', (e) => {
+            if (e.target === menuOverlay) {
+                menuOverlay.classList.remove('active');
+            }
+        });
+
+        // Close menu when clicking any link
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuOverlay.classList.remove('active');
+                menuLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+    }
 
     // Resize handler
     window.addEventListener('resize', () => {
